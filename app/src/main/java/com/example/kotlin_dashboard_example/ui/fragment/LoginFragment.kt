@@ -1,56 +1,163 @@
 package com.example.kotlin_dashboard_example.ui.fragment
 
+import ApiServiceResponse
+import ApiLoginSuccessResponse
 import android.os.Bundle
 import android.text.Editable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.example.kotlin_dashboard_example.R
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.example.kotlin_dashboard_example.api.APIService
+import com.example.kotlin_dashboard_example.api.ServerConfig.API_URL
+import com.example.kotlin_dashboard_example.api.getLoginUserInfo
+import com.example.kotlin_dashboard_example.databinding.LoginFragmentBinding
+import com.google.gson.GsonBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
+import org.json.JSONObject
+import retrofit2.HttpException
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
 
 class LoginFragment : Fragment() {
-    private lateinit var btnLogin : Button
-    private lateinit var passwordTextInput : TextInputLayout
-    private lateinit var passwordEditText : TextInputEditText
+    // LoginFragmentBinding : Converting the name of the XML file to Pascal case
+    // and adding the word "Binding" to the end
+    private var _binding : LoginFragmentBinding? = null
+    // This property is only valid between onCreateView and onDestroyView.
+    private val binding get() = _binding!!
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
+    ): View {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.login_fragment, container, false)
+        // inflate(inflater, parent, attachToParent) ¡V Use this in a Fragment or a RecyclerView
+        // Adapter (or ViewHolder) where you need to pass the parent ViewGroup to the binding object.
+        _binding = LoginFragmentBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        btnLogin = view.findViewById<View>(R.id.btn_login) as Button
-        passwordTextInput = view.findViewById<View>(R.id.password_text_input) as TextInputLayout
-        passwordEditText = view.findViewById<View>(R.id.password_edit_text) as TextInputEditText
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        inputTextValid()
+    }
 
-        // Set an error if the password is less than 8 characters.
-        btnLogin.setOnClickListener {
-            //Toast.makeText(this.context, "Login successfully", Toast.LENGTH_LONG).show()
-            if (!isPasswordValid(passwordEditText.text)) {
-                passwordTextInput.error = getString(R.string.error_password)
-            } else {
-                passwordTextInput.error = null
-            }
-        }
-
-        passwordEditText.setOnKeyListener { _, _, _ ->
-            if (isPasswordValid(passwordEditText.text)) {
-                passwordTextInput.error = null
-            }
-            false
-        }
-
-        return view
+    override fun onResume() {
+        super.onResume()
+        inputTextAction()
+    }
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
     }
 
     private fun isPasswordValid(text: Editable?): Boolean {
         return text != null && text.length >= 8
     }
 
-    private fun isEmailValid(text: Editable?): Boolean {
-        return text != null && text.isNotEmpty()
+    private fun isUserNameValid(text: Editable?): Boolean {
+        return text != null && text.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(text).matches()
+    }
+
+    private fun login() {
+        // Create Retrofit
+        val retrofit = Retrofit.Builder()
+            .baseUrl(API_URL)
+            // all the JSON serialization and deserialization is all handled for you.
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        // Create Service
+        val service = retrofit.create(APIService::class.java)
+
+        // Create JSON using JSONObject
+        val jsonObject = JSONObject().apply {
+            put("username", binding.usernameEditText.text)
+            put("password", binding.passwordEditText.text)
+        }
+        //Log.d("LoginFragment", "login: $jsonObject")
+
+        // Create RequestBody ( Not using any converter, like GsonConverter, MoshiConverter
+        val requestBody: RequestBody =
+            jsonObject.toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+        CoroutineScope(Dispatchers.IO).launch {
+            // Do the POST request and get response
+            val response: Response<ResponseBody> = service.login(requestBody)
+            withContext(Dispatchers.Main) {
+                try {
+                    if (response.isSuccessful) {
+                        // Convert raw JSON to pretty JSON using GSON library
+                        val body: String = response.body()!!.string()
+                        val gson = GsonBuilder().setPrettyPrinting().create()
+                        val mBody: ApiLoginSuccessResponse = gson.fromJson(body, ApiLoginSuccessResponse::class.java)
+                        Log.d("Login User token:", mBody.token)
+                        //val user = getLoginUserInfo(mBody.token)
+                        //Log.d("Login User :", user.sub)
+                    } else {
+                        val errorBody: String = response.errorBody()!!.string()
+                        val gson = GsonBuilder().create()
+                        val mError: ApiServiceResponse = gson.fromJson(
+                            errorBody,
+                            ApiServiceResponse::class.java
+                        )
+                        Log.e("RETROFIT_ERROR (${mError.status})", mError.message)
+                        Toast.makeText(context, "ERROR (${mError.status}): ${mError.message}", Toast.LENGTH_LONG).show()
+                    }
+                } catch (e: HttpException) {
+                    Toast.makeText(context, "Exception ${e.message}", Toast.LENGTH_LONG).show()
+                }
+
+            }
+        }
+    }
+
+    private fun inputTextValid() {
+        binding.btnLogin.setOnClickListener {
+            if(isUserNameValid(binding.usernameEditText.text)
+                && isPasswordValid(binding.passwordEditText.text)) {
+                login()
+            } else {
+                when {
+                    isUserNameValid(binding.usernameEditText.text) -> {
+                        binding.passwordInputText.error = getString(R.string.error_password)
+                    }
+                    isPasswordValid(binding.passwordEditText.text) -> {
+                        binding.usernameInputText.error = getString(R.string.error_username)
+                    }
+                    else -> {
+                        binding.passwordInputText.error = getString(R.string.error_password)
+                        binding.usernameInputText.error = getString(R.string.error_username)
+                    }
+                }
+            }
+        }
+    }
+
+    // Add an action which will be invoked when the input text is changing.
+    private fun inputTextAction() {
+        binding.usernameEditText.doOnTextChanged { text, _, _, _ ->
+            if (text != null && text.isNotEmpty()) {
+                binding.usernameInputText.error = null
+            }
+        }
+
+        binding.passwordEditText.doOnTextChanged { text, _, _, _ ->
+            if ( text != null && text.length >= 8) {
+                binding.passwordInputText.error = null
+            }
+        }
     }
 }
