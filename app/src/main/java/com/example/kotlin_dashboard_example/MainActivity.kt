@@ -1,8 +1,7 @@
 package com.example.kotlin_dashboard_example
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.example.kotlin_dashboard_example.databinding.ActivityMainBinding
 import com.example.kotlin_dashboard_example.ui.fragment.LoginFragment
 
@@ -17,11 +16,11 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        if (savedInstanceState == null) {
+        /*if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .add(R.id.container, LoginFragment())
+                .add(R.id.nav_host_fragment, LoginFragment())
                 .commit()
-        }
+        }*/
     }
 }

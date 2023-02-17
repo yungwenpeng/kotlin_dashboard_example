@@ -37,6 +37,8 @@ android {
 }
 
 dependencies {
+    def navigationVersion = "2.5.3"
+    def fragmentVersion = "1.5.5"
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.6.0'
@@ -50,6 +52,13 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    // https://developer.android.com/jetpack/androidx/releases/navigation#declaring_dependencies
+    implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
+    implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
+    // Java language implementation
+    implementation("androidx.fragment:fragment:$fragmentVersion")
+    // Kotlin
+    implementation("androidx.fragment:fragment-ktx:$fragmentVersion")
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

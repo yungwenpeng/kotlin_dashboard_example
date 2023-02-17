@@ -8,18 +8,24 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/welcome_background"
         android:orientation="horizontal">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardViewLogin"
             android:layout_width="match_parent"
             android:layout_height="285dp"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            app:cardBackgroundColor="#D3FFFFFF"
+            app:cardCornerRadius="20dp"
+            app:contentPaddingTop="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:background="#20C7F1EF"
+                android:orientation="vertical"
+                android:paddingTop="10dp">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/username_input_text"
@@ -90,17 +96,18 @@
                     android:backgroundTint="#00FFFFFF" />
 
                 <Button
-                    style="@style/Widget.MaterialComponents.Button.Icon"
                     android:id="@+id/btn_login"
+                    style="@style/Widget.MaterialComponents.Button.Icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:layout_marginVertical="20dp"
                     android:gravity="center"
+                    android:minHeight="48dp"
                     android:text="@string/login_submit"
                     app:cornerRadius="20dp"
                     app:icon="@drawable/ic_login_32"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TouchTargetSizeCheck" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

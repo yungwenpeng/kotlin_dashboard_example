@@ -1,7 +1,7 @@
 package com.example.kotlin_dashboard_example.ui.fragment
 
-import ApiServiceResponse
 import ApiLoginSuccessResponse
+import ApiServiceResponse
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
@@ -9,8 +9,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
 import com.example.kotlin_dashboard_example.R
 import com.example.kotlin_dashboard_example.api.APIService
 import com.example.kotlin_dashboard_example.api.ServerConfig.API_URL
@@ -43,7 +45,7 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View {
         // Inflate the layout for this fragment
-        // inflate(inflater, parent, attachToParent) ¡V Use this in a Fragment or a RecyclerView
+        // inflate(inflater, parent, attachToParent) – Use this in a Fragment or a RecyclerView
         // Adapter (or ViewHolder) where you need to pass the parent ViewGroup to the binding object.
         _binding = LoginFragmentBinding.inflate(inflater, container, false)
         return binding.root
@@ -103,9 +105,14 @@ class LoginFragment : Fragment() {
                         val body: String = response.body()!!.string()
                         val gson = GsonBuilder().setPrettyPrinting().create()
                         val mBody: ApiLoginSuccessResponse = gson.fromJson(body, ApiLoginSuccessResponse::class.java)
-                        Log.d("Login User token:", mBody.token)
+                        //Log.d("Login User token:", mBody.token)
                         //val user = getLoginUserInfo(mBody.token)
                         //Log.d("Login User :", user.sub)
+                        val bundle: Bundle = bundleOf(
+                            "token" to mBody.token,
+                            "username" to getLoginUserInfo(mBody.token).sub
+                        )
+                        Navigation.findNavController(binding.root).navigate(R.id.action_loginFragment_to_homeFragment, bundle)
                     } else {
                         val errorBody: String = response.errorBody()!!.string()
                         val gson = GsonBuilder().create()

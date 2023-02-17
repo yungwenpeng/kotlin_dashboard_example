@@ -18,6 +18,7 @@ A few resources to get you started if this is your first Android Kotlin project:
 - [Retrofit](https://square.github.io/retrofit/)
 - [Coroutine](https://kotlinlang.org/docs/coroutines-overview.html)
 - [Gson](https://github.com/google/gson)
+- [Navigation component](https://developer.android.com/guide/navigation/navigation-getting-started)
 
-## Demo Snapshot
-![demo_snapshot](demo_snapshot.png) 
+## Demo
+![demo_kotlin_example](demo_kotlin_example.gif) 
