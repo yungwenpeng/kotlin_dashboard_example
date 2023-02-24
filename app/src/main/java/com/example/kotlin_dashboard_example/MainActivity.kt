@@ -2,13 +2,14 @@ package com.example.kotlin_dashboard_example
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.kotlin_dashboard_example.databinding.ActivityMainBinding
-import com.example.kotlin_dashboard_example.ui.fragment.LoginFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         // inflate(inflater) -
         // Use this in an Activity onCreate where there is no parent view to pass to the binding object.

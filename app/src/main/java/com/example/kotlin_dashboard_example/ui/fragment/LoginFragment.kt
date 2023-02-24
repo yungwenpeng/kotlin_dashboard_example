@@ -1,7 +1,5 @@
 package com.example.kotlin_dashboard_example.ui.fragment
 
-import ApiLoginSuccessResponse
-import ApiServiceResponse
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
@@ -15,6 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.example.kotlin_dashboard_example.R
 import com.example.kotlin_dashboard_example.api.APIService
+import com.example.kotlin_dashboard_example.api.ApiLoginSuccessResponse
+import com.example.kotlin_dashboard_example.api.ApiServiceResponse
 import com.example.kotlin_dashboard_example.api.ServerConfig.API_URL
 import com.example.kotlin_dashboard_example.api.getLoginUserInfo
 import com.example.kotlin_dashboard_example.databinding.LoginFragmentBinding
@@ -45,7 +45,7 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View {
         // Inflate the layout for this fragment
-        // inflate(inflater, parent, attachToParent) – Use this in a Fragment or a RecyclerView
+        // inflate(inflater, parent, attachToParent) â€“ Use this in a Fragment or a RecyclerView
         // Adapter (or ViewHolder) where you need to pass the parent ViewGroup to the binding object.
         _binding = LoginFragmentBinding.inflate(inflater, container, false)
         return binding.root

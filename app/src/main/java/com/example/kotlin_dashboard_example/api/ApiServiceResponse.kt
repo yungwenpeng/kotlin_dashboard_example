@@ -1,3 +1,5 @@
+package com.example.kotlin_dashboard_example.api
+
 import com.google.gson.annotations.SerializedName
 
 data class ApiServiceResponse (
